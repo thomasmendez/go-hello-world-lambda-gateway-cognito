@@ -15,19 +15,24 @@ Globals:
       AllowHeaders: "'*'"
       AllowOrigin: "'*'"
 Resources:
+  ServerlessRestApiDev:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Dev
   RestApiFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function 
     Properties:
       Handler: bootstrap
       Runtime: provided.al2023
       Architectures: [arm64]
       Events:
         CatchAll:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Type: Api 
           Properties:
             Path: "/api/{proxy+}"
             Method: ANY
-      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+            RestApiId: !Ref ServerlessRestApiDev
+      Environment:
         Variables:
           REGION: us-east-2
 
