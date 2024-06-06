@@ -1,0 +1,43 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  SAM Template for personal-website-backend-stg
+
+Globals:
+  Function:
+    Timeout: 10
+    MemorySize: 128
+    LoggingConfig:
+      LogFormat: JSON
+  Api:
+    Cors:
+      AllowMethods: "'*'"
+      AllowHeaders: "'*'"
+      AllowOrigin: "'*'"
+Resources:
+  RestApiFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      Handler: bootstrap
+      Runtime: provided.al2023
+      Architectures: [arm64]
+      Events:
+        CatchAll:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: "/api/{proxy+}"
+            Method: ANY
+      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+        Variables:
+          REGION: us-east-2
+
+Outputs:
+  GoHelloWorldLambdaGatewayCognitoAPI:
+    Description: API Gateway endpoint URL for Dev environment for First Function
+    Value: !Sub "https://${ServerlessRestApiDev}.execute-api.${AWS::Region}.amazonaws.com/${ServerlessRestApiDev.Stage}/"
+  RestApiFunction:
+    Description: First Lambda Function ARN
+    Value: !GetAtt RestApiFunction.Arn
+  RestApiFunctionIamRole:
+    Description: Implicit IAM Role created for Hello World function
+    Value: !GetAtt RestApiFunctionRole.Arn
