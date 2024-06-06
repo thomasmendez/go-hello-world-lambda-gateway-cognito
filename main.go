@@ -1,6 +1,11 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
+	"log"
+	"net/http"
+
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
@@ -10,9 +15,45 @@ func main() {
 }
 
 func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	response := events.APIGatewayProxyResponse{
-		StatusCode: 200,
-		Body:       "\"Hello from Lambda!\"",
+	log.Print("Hello World")
+
+	var person Person
+
+	err := json.Unmarshal([]byte(request.Body), &person)
+
+	if err != nil {
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusInternalServerError,
+			Body:       fmt.Sprintf("Error in unmarshal: %v", err),
+		}, err
 	}
-	return response, nil
+
+	message := fmt.Sprintf("Hello %v, %v", *person.FirstName, *person.LastName)
+
+	response := Response{
+		Message: &message,
+	}
+
+	responseJson, err := json.Marshal(response)
+
+	if err != nil {
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusInternalServerError,
+			Body:       fmt.Sprintf("Error in marshalling: %v", err),
+		}, err
+	}
+
+	return events.APIGatewayProxyResponse{
+		StatusCode: http.StatusOK,
+		Body:       string(responseJson),
+	}, nil
+}
+
+type Person struct {
+	FirstName *string `json:"firstName"`
+	LastName  *string `json:"lastName"`
+}
+
+type Response struct {
+	Message *string `json:"message"`
 }
