@@ -53,7 +53,7 @@ Resources:
         AllowAdminCreateUserOnly: true
       AutoVerifiedAttributes:
         - email
-      AliasAttributes:
+      UsernameAttributes:
         - email
   AppClient:
     Type: AWS::Cognito::UserPoolClient

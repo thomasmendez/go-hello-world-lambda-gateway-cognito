@@ -67,11 +67,11 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResp
 		fmt.Println("cognito:username: claim not found or not a string")
 	}
 
-	if email, ok := claims["cognito:email"].(string); ok {
-		fmt.Println("cognito:email:", email)
+	if email, ok := claims["email"].(string); ok {
+		fmt.Println("email:", email)
 		user.Email = &email
 	} else {
-		fmt.Println("cognito:email claim not found or not a string")
+		fmt.Println("email claim not found or not a string")
 	}
 
 	responseJson, err := json.Marshal(user)
