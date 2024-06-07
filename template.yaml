@@ -1,7 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  SAM Template for personal-website-backend-stg
+  Example HTTP API with a JWT authorizer.
+  This template includes an Amazon Cognito user pool as the issuer for the JWT authorizer and an Amazon Cognito app client as the audience for the authorizer.
+  Manually add user to Cognito User Pool, and then sign in in the url provided in the Outputs section.
 
 Globals:
   Function:
@@ -67,7 +69,7 @@ Resources:
       AllowedOAuthFlowsUserPoolClient: true
       ClientName: !Sub ${AWS::StackName}-client
       CallbackURLs:
-        # - !Sub https://${ServerlessRestApiDev}.execute-api.${AWS::Region}.amazonaws.com
+        - !Sub https://${ServerlessRestApiDev}.execute-api.${AWS::Region}.amazonaws.com/${ServerlessRestApiDev.Stage}/
         - https://jwt.io
       ExplicitAuthFlows:
         - ALLOW_REFRESH_TOKEN_AUTH
@@ -85,7 +87,7 @@ Resources:
       UserPoolId: !Ref UserPool
   
 Outputs:
-  GoHelloWorldLambdaGatewayCognitoAPI:
+  GatewayAPIEndpoint:
     Description: API Gateway endpoint URL for Dev environment for First Function
     Value: !Sub "https://${ServerlessRestApiDev}.execute-api.${AWS::Region}.amazonaws.com/${ServerlessRestApiDev.Stage}/"
   LambdaFunction:
@@ -94,5 +96,9 @@ Outputs:
   LambdaFunctionIamRole:
     Description: Implicit IAM Role created for Hello World function
     Value: !GetAtt LambdaFunctionRole.Arn
-  SignupURL:
-    Value: !Sub https://${HostedUI}.auth.${AWS::Region}.amazoncognito.com/login?client_id=${AppClient}&response_type=token&scope=email+profile&redirect_uri=https://${ServerlessRestApiDev}.execute-api.${AWS::Region}.amazonaws.com
+  LoginURL:
+    Value: !Sub https://${HostedUI}.auth.${AWS::Region}.amazoncognito.com/login?client_id=${AppClient}&response_type=token&scope=email+profile&redirect_uri=https://${ServerlessRestApiDev}.execute-api.${AWS::Region}.amazonaws.com/${ServerlessRestApiDev.Stage}/
+    Description: Output is a URL for an Amazon Cognito hosted UI where clients can sign up and sign in to receive a JWT. After a client signs in, the client is redirected to your HTTP API with an access token in the URL. To invoke the API with the access token pass it in the authorization header.
+  LoginURLRedirectJWTIO:
+    Value: !Sub https://${HostedUI}.auth.${AWS::Region}.amazoncognito.com/login?client_id=${AppClient}&response_type=token&scope=email+profile&redirect_uri=https://jwt.io
+    Description: Output is a URL for an Amazon Cognito hosted UI where clients can sign up and sign in to receive a JWT. After a client signs in, the client is redirected to jwt.io where the token details can be viewed.
