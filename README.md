@@ -31,7 +31,7 @@ Backend for updating details for personal website. Backend is a deployed Go Lamb
 
     *Note: Use `sam.cmd` when running AWS SAM on windows*
 
-    To rebuild and apply local changes, use `sam.cmd build --use-container` 
+    To rebuild and apply local changes, use `sam.cmd build --use-container`
 
 4. **(Optional) Run CRUD Requests Individually**
     

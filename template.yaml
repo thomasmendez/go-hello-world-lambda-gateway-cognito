@@ -67,8 +67,8 @@ Resources:
       AllowedOAuthFlowsUserPoolClient: true
       ClientName: !Sub ${AWS::StackName}-client
       CallbackURLs:
-        - !Sub https://${ServerlessRestApiDev}.execute-api.${AWS::Region}.amazonaws.com
-        # - https://jwt.io
+        # - !Sub https://${ServerlessRestApiDev}.execute-api.${AWS::Region}.amazonaws.com
+        - https://jwt.io
       ExplicitAuthFlows:
         - ALLOW_REFRESH_TOKEN_AUTH
         - ALLOW_USER_SRP_AUTH
