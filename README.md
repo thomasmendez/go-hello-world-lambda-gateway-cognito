@@ -46,11 +46,55 @@ Ensure you follow the same steps you did to build the executable and zipping the
     GOARCH=arm64 GOOS=linux go build -o bootstrap main.go
     ```
 
-2. **Zip project (windows)**
+2. **Zip project (Windows)**
 
     `C:\Users\owner\go\bin\build-lambda-zip.exe -o lambda-handler.zip bootstrap` using the provided `build-lambda-zip` package. If needed, you can install with `go install github.com/aws/aws-lambda-go/cmd/build-lambda-zip@latest`. See [To create a .zip deployment package (Windows)](https://docs.aws.amazon.com/lambda/latest/dg/golang-package.html)
 
-3. **Deploy CloudFromation stack template**
+3. **Deploy CloudFormation stack template**
     ```shell
     sam.cmd deploy --guided --template-file=template.yaml
     ```
+
+## Login
+
+The provided SAM template does not allow any user to sign up. Only designated users in the AWS Cognito Pool can login.
+
+### Create Cognito User
+
+1. **Login to AWS Console**
+
+2. **Navigate to CloudFormation**
+
+3. **Click on this CloudFormation Stack**
+
+4. **Navigate to Resources** 
+
+5. **Click on UserPool Physical ID Link**
+
+6. **Click Create User**
+
+7. **Add User Details and Create User**
+
+### Login to AWS Cognito
+
+8. **Navigate to CloudFormation Stack**
+
+9. **Navigate to Outputs**
+
+10. **Click on LoginURLRedirectJWTIO Value**
+
+11. **Login with Created User Credentials**
+
+12. **Obtain Access Token**
+
+### Perform Authorized Request
+
+13. **Navigate to CloudFormation Outputs**
+
+14. **Obtain GatewayAPIEndpoint Value**
+
+15. **Perform POST Request with Endpoint Value on `/Dev/api/any` Route with Bearer Token in Authorization Header**
+
+16. **Verify `username` and `email` Values are Present in Response**
+
+17. **(Optional) Check CloudWatch Logs**
