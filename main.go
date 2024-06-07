@@ -5,41 +5,82 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 func main() {
 	lambda.Start(handler)
 }
 
-func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	log.Print("Hello World")
+func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResponse, error) {
+	log.Print("Hello World...")
 
-	var person Person
-
-	err := json.Unmarshal([]byte(request.Body), &person)
+	reqBytes, err := json.Marshal(request)
 
 	if err != nil {
+		errMessage := fmt.Sprintf("Error in marshal request: %v", err)
+		log.Print(errMessage)
 		return events.APIGatewayProxyResponse{
 			StatusCode: http.StatusInternalServerError,
-			Body:       fmt.Sprintf("Error in unmarshal: %v", err),
+			Body:       errMessage,
 		}, err
 	}
 
-	message := fmt.Sprintf("Hello %v, %v", *person.FirstName, *person.LastName)
+	log.Print(string(reqBytes))
 
-	response := Response{
-		Message: &message,
-	}
+	log.Print("Extract token claims...")
 
-	responseJson, err := json.Marshal(response)
+	tokenRequest := request.Headers["Authorization"]
+
+	bearerToken := strings.Split(tokenRequest, "Bearer ")
+
+	// TODO: Validate token signature
+
+	claims := jwt.MapClaims{}
+
+	_, _, err = new(jwt.Parser).ParseUnverified(bearerToken[1], claims)
 
 	if err != nil {
+		errMessage := fmt.Sprintf("Error in parsing token: %v", err)
+		log.Print(errMessage)
 		return events.APIGatewayProxyResponse{
 			StatusCode: http.StatusInternalServerError,
-			Body:       fmt.Sprintf("Error in marshalling: %v", err),
+			Body:       errMessage,
+		}, err
+	}
+
+	for key, value := range claims {
+		keyVal := fmt.Sprintf("%s: %v\n", key, value)
+		log.Print(keyVal)
+	}
+
+	var user User
+
+	if username, ok := claims["cognito:username"].(string); ok {
+		fmt.Println("cognito:username:", username)
+		user.Username = &username
+	} else {
+		fmt.Println("cognito:username: claim not found or not a string")
+	}
+
+	if email, ok := claims["email"].(string); ok {
+		fmt.Println("email:", email)
+		user.Email = &email
+	} else {
+		fmt.Println("email claim not found or not a string")
+	}
+
+	responseJson, err := json.Marshal(user)
+
+	if err != nil {
+		errMessage := fmt.Sprintf("Error in marshalling user response: %v", err)
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusInternalServerError,
+			Body:       errMessage,
 		}, err
 	}
 
@@ -49,11 +90,7 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	}, nil
 }
 
-type Person struct {
-	FirstName *string `json:"firstName"`
-	LastName  *string `json:"lastName"`
-}
-
-type Response struct {
-	Message *string `json:"message"`
+type User struct {
+	Username *string `json:"username"`
+	Email    *string `json:"email"`
 }
