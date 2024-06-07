@@ -78,7 +78,7 @@ The provided SAM template does not allow any user to sign up. Only designated us
 
 9. **Navigate to Outputs**
 
-10. **Click on LoginURLRedirectJWTIO Value**
+10. **Click on LoginURL Value**
 
 11. **Login with Created User Credentials**
 
