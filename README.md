@@ -1,7 +1,5 @@
 # go-hello-world-lambda-gateway-cognito
 
-# personal-website-backend
-
 Backend for updating details for personal website. Backend is a deployed Go Lambda function that updates a DynamoDB table.
 
 ## Requirements
