@@ -26,6 +26,7 @@ Resources:
         Authorizers:
           CognitoTokenAuthorizer:
             UserPoolArn: !GetAtt UserPool.Arn
+        AddDefaultAuthorizerToCorsPreflight: false
   LambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
