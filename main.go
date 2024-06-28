@@ -25,7 +25,7 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResp
 		errMessage := fmt.Sprintf("Error in marshal request: %v", err)
 		log.Print(errMessage)
 		return events.APIGatewayProxyResponse{
-			Headers:    addProxyHeaders("dev"),
+			Headers:    addProxyHeaders(),
 			StatusCode: http.StatusInternalServerError,
 			Body:       errMessage,
 		}, err
@@ -49,7 +49,7 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResp
 		errMessage := fmt.Sprintf("Error in parsing token: %v", err)
 		log.Print(errMessage)
 		return events.APIGatewayProxyResponse{
-			Headers:    addProxyHeaders("dev"),
+			Headers:    addProxyHeaders(),
 			StatusCode: http.StatusInternalServerError,
 			Body:       errMessage,
 		}, err
@@ -81,33 +81,25 @@ func handler(request events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResp
 	if err != nil {
 		errMessage := fmt.Sprintf("Error in marshalling user response: %v", err)
 		return events.APIGatewayProxyResponse{
-			Headers:    addProxyHeaders("dev"),
+			Headers:    addProxyHeaders(),
 			StatusCode: http.StatusInternalServerError,
 			Body:       errMessage,
 		}, err
 	}
 
 	return events.APIGatewayProxyResponse{
-		Headers:    addProxyHeaders("dev"),
+		Headers:    addProxyHeaders(),
 		StatusCode: http.StatusOK,
 		Body:       string(responseJson),
 	}, nil
 }
 
-func addProxyHeaders(env string) map[string]string {
-	switch env {
-	case "dev":
-		return map[string]string{
-			"Access-Control-Allow-Origin":  "http://localhost:5173",
-			"Access-Control-Allow-Headers": "*",
-			"Access-Control-Allow-Methods": "*",
-		}
-	default:
-		return map[string]string{
-			"Access-Control-Allow-Origin":  "*",
-			"Access-Control-Allow-Headers": "*",
-			"Access-Control-Allow-Methods": "*",
-		}
+func addProxyHeaders() map[string]string {
+	return map[string]string{
+		"Access-Control-Allow-Origin":      "*",
+		"Access-Control-Allow-Headers":     "*",
+		"Access-Control-Allow-Methods":     "*",
+		"Access-Control-Allow-Credentials": "true",
 	}
 }
 
